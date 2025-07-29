@@ -3,6 +3,7 @@ package com.mahammad.userreservationcrudapi.service.concretes;
 import com.mahammad.userreservationcrudapi.dto.request.ReservationCreateRequest;
 import com.mahammad.userreservationcrudapi.dto.request.ReservationUpdateRequest;
 import com.mahammad.userreservationcrudapi.dto.response.ReservationResponse;
+import com.mahammad.userreservationcrudapi.exception.BusinessException;
 import com.mahammad.userreservationcrudapi.exception.NotFoundException;
 import com.mahammad.userreservationcrudapi.mapper.ReservationMapper;
 import com.mahammad.userreservationcrudapi.model.Reservation;
@@ -38,6 +39,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationResponse save(ReservationCreateRequest request, UUID id) {
         User userExists = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (request.getStartTime().isAfter(request.getEndTime())) {
+            throw new BusinessException("Reservation start time must be before end time");
+        }
+
         Reservation reservation = ReservationMapper.toEntity(request, userExists);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationMapper.toResponse(savedReservation);
@@ -47,6 +53,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationResponse update(UUID id, ReservationUpdateRequest request) {
         Reservation reservationExists = reservationRepository.findById(id).orElseThrow(() -> new NotFoundException("Reservation not found"));
+
+        if(request.getStartTime().isAfter(request.getEndTime())){
+            throw new BusinessException("Reservation start time must be before end time");
+        }
+
         Reservation reservation = ReservationMapper.updateEntity(reservationExists, request);
         Reservation updatedReservation = reservationRepository.save(reservation);
         return ReservationMapper.toResponse(updatedReservation);

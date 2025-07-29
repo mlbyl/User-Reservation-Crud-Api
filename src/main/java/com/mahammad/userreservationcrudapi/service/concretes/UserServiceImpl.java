@@ -3,6 +3,7 @@ package com.mahammad.userreservationcrudapi.service.concretes;
 import com.mahammad.userreservationcrudapi.dto.request.UserCreateRequest;
 import com.mahammad.userreservationcrudapi.dto.request.UserUpdateRequest;
 import com.mahammad.userreservationcrudapi.dto.response.UserResponse;
+import com.mahammad.userreservationcrudapi.exception.BusinessException;
 import com.mahammad.userreservationcrudapi.exception.NotFoundException;
 import com.mahammad.userreservationcrudapi.mapper.UserMapper;
 import com.mahammad.userreservationcrudapi.model.User;
@@ -35,6 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse save(UserCreateRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("User Email already exists");
+        }
         User user = UserMapper.toEntity(request);
         User savedUser = userRepository.save(user);
         return UserMapper.toResponse(savedUser);
@@ -43,6 +47,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse update(UUID id, UserUpdateRequest request) {
         User existUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new BusinessException("User email already taken");
+        }
         User user = UserMapper.updateEntity(request, existUser);
         User updatedUser = userRepository.save(user);
         return UserMapper.toResponse(updatedUser);
