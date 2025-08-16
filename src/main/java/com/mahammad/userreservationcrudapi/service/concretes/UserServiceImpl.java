@@ -10,6 +10,7 @@ import com.mahammad.userreservationcrudapi.model.User;
 import com.mahammad.userreservationcrudapi.repository.UserRepository;
 import com.mahammad.userreservationcrudapi.service.abstracts.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -40,6 +42,8 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("User Email already exists");
         }
         User user = UserMapper.toEntity(request);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
         return UserMapper.toResponse(savedUser);
     }
@@ -47,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse update(UUID id, UserUpdateRequest request) {
         User existUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
-        if(userRepository.existsByEmail(request.getEmail())){
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("User email already taken");
         }
         User user = UserMapper.updateEntity(request, existUser);

@@ -18,6 +18,7 @@ public class UserMapper {
                 user.getSurname(),
                 user.getAge(),
                 user.getEmail(),
+                user.getRole(),
                 ReservationMapper.toResponse(user.getReservations())
 
         );
@@ -38,7 +39,8 @@ public class UserMapper {
                 user.getName(),
                 user.getSurname(),
                 user.getAge(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRole()
         );
     }
 
@@ -49,6 +51,7 @@ public class UserMapper {
                 .name(request.getName())
                 .surname(request.getSurname())
                 .password(request.getPassword())
+                .role(request.getRole())
                 .build();
     }
 
@@ -58,6 +61,7 @@ public class UserMapper {
         user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
+        user.setRole(request.getRole());
 
         return user;
     }

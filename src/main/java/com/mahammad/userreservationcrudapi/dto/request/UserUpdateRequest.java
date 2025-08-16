@@ -1,5 +1,7 @@
 package com.mahammad.userreservationcrudapi.dto.request;
 
+import com.mahammad.userreservationcrudapi.model.enums.Role;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,4 +28,8 @@ public class UserUpdateRequest {
 
     @Size(min = 8, max = 64, message = "User password must be between 8 and 64 characters long")
     private String password;
+
+    @NotNull(message = "Role type required")
+    @Schema(allowableValues = {"ROLE_USER", "ROLE_ADMIN"})
+    private Role role;
 }
